@@ -1,58 +1,63 @@
-public class Course {
-    private final int MAX_ENROLLED_STUDENTS = 5;
-    private Student[] students = new Student[MAX_ENROLLED_STUDENTS];
-    private int enrollment = 0;
-    private Instructor instructor;
-    private String courseCode;
-    private String courseName;
+import java.util.Arrays;
 
-    public Course(String courseCode, String courseName) {
-        this.courseCode = courseCode;
+public class Course {
+    private String courseName;
+    String[] students = new String[100];
+    private int numberOfStudents;
+
+    public Course(String courseName) {
         this.courseName = courseName;
     }
 
-    public boolean enroll(Student student) {
-        if (enrollment < MAX_ENROLLED_STUDENTS) {
-            students[enrollment++] = student;
-            return true;
+    public void addStudent(String student) {
+        if (numberOfStudents == students.length) {
+            students = Arrays.copyOf(students, students.length * 2);
         }
-        return false;
+        students[numberOfStudents] = student;
+        numberOfStudents++;
     }
 
-    public boolean unenroll(Student student) {
-        for (int i = 0; i < enrollment; i++) {
-            if (students[i].equals(student)) {
-                System.arraycopy(students, i + 1, students, i, enrollment - i - 1);
-                students[--enrollment] = null;
-                return true;
-            }
-        }
-        return false;
+    public String[] getStudents() {
+        return Arrays.copyOf(students, numberOfStudents);
     }
 
-    public void assignGrade(Student student, double grade) {
-        student.setAverage((student.getAverage() + grade) / 2);
-    }
-
-    public String getCourseCode() {
-        return courseCode;
+    public int getNumberOfStudents() {
+        return numberOfStudents;
     }
 
     public String getCourseName() {
         return courseName;
     }
 
-    public Instructor getInstructor() {
-        return instructor;
+    public void dropStudent(String student) {
+        for (int i = 0; i < numberOfStudents; i++) {
+            if (students[i].equals(student)) {
+                for (int j = i; j < numberOfStudents - 1; j++) {
+                    students[j] = students[j + 1];
+                }
+                numberOfStudents--;
+                return;
+            }
+        }
     }
 
-    public void setInstructor(Instructor instructor) {
-        this.instructor = instructor;
+    public void clear() {
+        students = new String[100];
+        numberOfStudents = 0;
     }
 
-    @Override
-    public String toString() {
-        return String.format("Course[code=%s, name=%s, instructor=%s, enrolled=%d]", courseCode, courseName,
-                instructor != null ? instructor.getName() : "No instructor", enrollment);
+    // Test program
+    public static void main(String[] args) {
+        Course course = new Course("COSC 1047O");
+        course.addStudent("Student 1");
+        course.addStudent("Student 2");
+        course.addStudent("Student 3");
+
+        course.dropStudent("Student 2");
+
+        String[] remainingStudents = course.getStudents();
+        for (String student : remainingStudents) {
+            System.out.println(student);
+        }
     }
 }
